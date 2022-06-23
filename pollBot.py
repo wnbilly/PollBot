@@ -7,28 +7,32 @@ import random
 
 import discord
 from discord.ext import commands
-from discord import Option
-from discord import SlashCommand
+from discord import option
+from discord.ui import Button
 
 
 TOKEN = "OTg5NDMzNTc5NzczNzc1OTAy.GlW4V9.9q1SrWh2h9qLu0OmPbTuwqeL7BgEFKhrm96p5I"
 
-bot = discord.Bot(name="PollBot", command_prefix="+")
-slash = SlashCommand(bot, sync_commands=True)
+bot = discord.Bot(command_prefix="+")
 @bot.event
 async def on_ready():
-    print("Poll Bot ready.")
-    print(f"Poll Bot ready via {bot.user}")
+    print(f"PollBot ready via {bot.user}.")
 
 # note : option_type = 3 for string, 4 for integer, 5 for boolean
 
-# poll command, callable via /poll "question" "number_of_possible_answers"
-@slash.slash(name="poll", options=[], description="First poll function")
-async def display_poll(ctx, question, answer1, answer2):
-    question: Option(str, "the question to ask", required=True)
-    #answer1: Option(str, "sentence that describes the 1st answer", required=True)
-    #answer2: Option(str, "sentence that describes the 2nd answer", required=True)
-    ctx.send("The question is " + question)
+# poll command, callable via /poll "question" "answer1" "answer2"
+@bot.slash_command(name="poll", description="Create a poll")
+@option("question", description="Enter the question to ask")
+@option("answer1", description="Enter 1st answer")
+@option("answer2", description="Enter 2nd answer")
+@option("gender", description="Choose your gender", choices=["Male", "Female", "Other"])
 
+async def test(
+    ctx: discord.ApplicationContext,
+    question: str,
+    answer1: str,
+    answer2: int,
+):
+    await ctx.send("The question is " + question)
 
 bot.run(TOKEN)
