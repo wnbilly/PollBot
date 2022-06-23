@@ -1,11 +1,11 @@
 from PIL import Image, ImageDraw, ImageFont
 
 
-def percentage_display(percentages):
+def percentage_display(question: str, percentages):
     
     nb_bars = len(percentages)
 
-    bar_height = 70
+    bar_height = 60
     height_between_bars = 25
     bar_width = 1000
 
@@ -25,13 +25,17 @@ def percentage_display(percentages):
 
     # sample text and font
 
-    font_size = 42
+    font_size = 35
     lato_font = ImageFont.truetype("~/.share/fonts/Lato-Regular.ttf", font_size, encoding="unic")
     text_color = "white"
     text_outline_width = 3
     text_outline_color = "black"
 
-    colors_list=["blue", "red", "green"]
+    blue_pastel = (166, 199, 231, 255)
+    red_pastel = (255, 105 ,97, 255)
+    green_pastel = (119, 221, 119, 255)
+
+    colors_list=[blue_pastel, red_pastel, green_pastel]
 
     for i in range(nb_bars):
 

@@ -43,15 +43,14 @@ async def test(
 
     async def answer2_button_callback(interaction):
         await interaction.response.send_message("Button ")
-        await print("DESO POUR LE SPAM, HESITEZ PAS A MUTER LE CHANNEL")
-
-
+        await print("2")
 
     async def refresh_display(interaction):
         percentages = [random.randint(0,100)/100, random.randint(0,100)/100, random.randint(0,100)/100] # from 0 to 1
         percentage_display(percentages)
-        await InteractionMessage.edit_original_message(file=discord.File('barChart.png'), content="Last update at " +str(time.strftime('%X'))+ "," + str(time.strftime('%x')))
-        await ctx.send(file=discord.File('barChart.png'), content="Last update at " +str(time.strftime('%X'))+ "," + str(time.strftime('%x')))
+        message = interaction.original_message()
+        message.delete()
+        await ctx.send(file=discord.File('barChart.png'), content=f"Last update at {str(time.strftime('%X'))} on day {str(time.strftime('%x'))}")
 
     # refresh button
     button_refresh_display = Button(label="Refresh Display", style=discord.ButtonStyle.red)
@@ -61,10 +60,10 @@ async def test(
     display_view.add_item(button_refresh_display)
 
     # create and display the choice buttons
-    button1 = Button(label="1 : " + answer1, style=discord.ButtonStyle.blurple)
+    button1 = Button(label="A : " + answer1, style=discord.ButtonStyle.blurple)
     button1.callback = answer_button_callback
 
-    button2 = Button(label="2 : " + answer2, style=discord.ButtonStyle.blurple)
+    button2 = Button(label="B : " + answer2, style=discord.ButtonStyle.blurple)
     button1.callback = answer2_button_callback
 
     buttons_view = View()
@@ -76,6 +75,6 @@ async def test(
     # image update + 1st display
     percentages = [random.randint(0,100)/100, random.randint(0,100)/100, random.randint(0,100)/100] # from 0 to 1
     percentage_display(percentages)
-    await ctx.send("Last update at " +str(time.strftime('%X'))+ "," + str(time.strftime('%x')), file=discord.File('barChart.png'), view=display_view)
+    await ctx.send("Last update at " +str(time.strftime('%X'))+ " on date " + str(time.strftime('%x')), file=discord.File('barChart.png'), view=display_view)
 
 bot.run(TOKEN)
