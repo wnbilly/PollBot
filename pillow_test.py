@@ -1,10 +1,5 @@
 from PIL import Image, ImageDraw, ImageFont
 
-width = 400
-height = 300
-
-
-
 
 def percentage_display(percentages):
     
