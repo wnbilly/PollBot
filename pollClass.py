@@ -10,11 +10,24 @@ from discord.ui import Button, View
 
 class Poll():
 
-    def __init__(self, ctx: discord.ApplicationContext, question: str, answer1: str, answer2: str, display: int):
+    def __init__(
+        self,
+        ctx: discord.ApplicationContext,
+        question: str,
+        answer1: str,
+        answer2: str,
+        answer3: str,
+        answer4: str,
+        answer5: str,
+        answer6: str,
+        answer7: str,
+        answer8: str,
+        display: int,
+        ):
 
         self.ctx = ctx
         self.question = question
-        self.answers = [answer1, answer2]
+        self.answers = [answer1, answer2, answer3, answer4, answer5, answer6, answer7, answer8]
         self.display = display
 
         self.choices = {} # dict of the choices of the users

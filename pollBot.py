@@ -22,8 +22,14 @@ async def on_ready():
 # poll command, callable via /poll "question" "answer1" "answer2"
 @bot.slash_command(name="poll", description="Create a poll")
 @option("question", description="Enter the question to ask")
-@option("answers", description="Enter 1st answer")
-@option("answer2", description="Enter 2nd answer")
+@option("answer1", description="Enter 1st answer")
+@option("answer2", description="Enter 2nd answer", required=False)
+@option("answer3", description="Enter 3rd answer", required=False)
+@option("answer4", description="Enter 4th answer", required=False)
+@option("answer5", description="Enter 5th answer", required=False)
+@option("answer6", description="Enter 6th answer", required=False)
+@option("answer7", description="Enter 7th answer", required=False)
+@option("answer8", description="Enter 8th answer", required=False)
 @option("display", description="Choose the way to display the results :\n 0 : None \n 1 : Bars", choices=[0, 1], required=False)
 
 async def create_poll(
@@ -31,6 +37,12 @@ async def create_poll(
     question: str,
     answer1: str,
     answer2: str,
+    answer3: str,
+    answer4: str,
+    answer5: str,
+    answer6: str,
+    answer7: str,
+    answer8: str,
     display: int,
 ):
     print(f"{ctx.interaction.user.name} created a poll : " + question)
