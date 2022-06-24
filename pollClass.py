@@ -14,20 +14,13 @@ class Poll():
         self,
         ctx: discord.ApplicationContext,
         question: str,
-        answer1: str,
-        answer2: str,
-        answer3: str,
-        answer4: str,
-        answer5: str,
-        answer6: str,
-        answer7: str,
-        answer8: str,
+        answers: list,
         display: int,
         ):
 
         self.ctx = ctx
         self.question = question
-        self.answers = [answer1, answer2, answer3, answer4, answer5, answer6, answer7, answer8]
+        self.answers = list(filter(None, answers)) # extract non empty answers
         self.display = display
 
         self.choices = {} # dict of the choices of the users
