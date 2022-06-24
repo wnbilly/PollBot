@@ -1,5 +1,4 @@
-# https://github.com/Pycord-Development/pycord/blob/master/examples/views/confirm.py
-# https://github.com/Pycord-Development/pycord/blob/master/examples/app_commands/slash_basic.py
+# https://github.com/Pycord-Development/pycord/blob/master/examples/app_commands/slash_options.py
 
 
 import time
@@ -19,8 +18,6 @@ bot = discord.Bot(command_prefix="+")
 async def on_ready():
     print(f"PollBot ready via {bot.user}.")
 
-# note : option_type = 3 for string, 4 for integer, 5 for boolean
-
 
 # poll command, callable via /poll "question" "answer1" "answer2"
 @bot.slash_command(name="poll", description="Create a poll")
@@ -29,7 +26,7 @@ async def on_ready():
 @option("answer2", description="Enter 2nd answer")
 @option("display", description="Choose the way to display the results :\n 0 : None \n 1 : Bars", choices=[0, 1], required=False)
 
-async def test(
+async def poll(
     ctx: discord.ApplicationContext,
     question: str,
     answer1: str,
