@@ -36,7 +36,9 @@ async def poll(
 
     sondage = Poll(ctx, question, answer1, answer2, display)
 
-
     await sondage.send_poll(ctx.interaction)
+
+
+    await display_view.wait()
 
 bot.run(TOKEN)
