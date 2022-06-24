@@ -1,7 +1,7 @@
 from PIL import Image, ImageDraw, ImageFont
 
 
-def percentage_display(question: str, percentages):
+def percentage_display(percentages):
     
     nb_bars = len(percentages)
 
@@ -48,11 +48,12 @@ def percentage_display(question: str, percentages):
         draw.rounded_rectangle(xy_bar, radius=radius, fill=(255, 255, 255, 125), outline="black", width=bar_outline_width)
 
         # fill the bar
-        top_left_point_fill = (width_margin+bar_outline_width, height_margin+i*bar_height+i*height_between_bars+bar_outline_width)
-        bottom_right_point_fill = ((width_margin+bar_width)*percentages[i], height_margin+(i+1)*bar_height+i*height_between_bars-bar_outline_width)
-        xy_fill = [top_left_point_fill, bottom_right_point_fill]
+        if percentages[i]!=0:
+            top_left_point_fill = (width_margin+bar_outline_width, height_margin+i*bar_height+i*height_between_bars+bar_outline_width)
+            bottom_right_point_fill = ((width_margin+bar_width)*(percentages[i]), height_margin+(i+1)*bar_height+i*height_between_bars-bar_outline_width)
+            xy_fill = [top_left_point_fill, bottom_right_point_fill]
 
-        draw.rounded_rectangle(xy_fill, radius=radius-bar_outline_width, fill=colors_list[i], outline="white", width=fill_outline_width)
+            draw.rounded_rectangle(xy_fill, radius=radius-bar_outline_width, fill=colors_list[i], outline="white", width=fill_outline_width)
 
         # add the percentage as text in the bar
 
