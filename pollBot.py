@@ -8,7 +8,7 @@ import discord
 from discord.ext import commands
 from discord import option, InteractionMessage
 from discord.ui import Button, View
-from pollClass import *
+from pollClass import Poll, Pollb
 from pollBot_display import percentage_display
 
 TOKEN = "OTg5NDMzNTc5NzczNzc1OTAy.GlW4V9.9q1SrWh2h9qLu0OmPbTuwqeL7BgEFKhrm96p5I"
