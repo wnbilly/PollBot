@@ -1,7 +1,7 @@
 from PIL import Image, ImageDraw, ImageFont
 
 
-def percentage_display(question: str, percentages):
+def percentage_display(percentages):
     
     nb_bars = len(percentages)
 

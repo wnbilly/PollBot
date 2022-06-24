@@ -8,7 +8,7 @@ import discord
 from discord.ext import commands
 from discord import option, InteractionMessage
 from discord.ui import Button, View
-
+from Poll import *
 from pollBot_display import percentage_display
 
 TOKEN = "OTg5NDMzNTc5NzczNzc1OTAy.GlW4V9.9q1SrWh2h9qLu0OmPbTuwqeL7BgEFKhrm96p5I"
@@ -34,44 +34,9 @@ async def poll(
     display: int,
 ):
 
-    async def answer_button_callback(interaction):
-        await interaction.response.send_message("Button ")
-        nb_answer1 += 1
+    sondage = Poll(ctx, question, answer1, answer2, display)
 
-    async def answer2_button_callback(interaction):
-        await interaction.response.send_message("Button ")
-        await print("2")
 
-    async def refresh_display(interaction):
-        percentages = [random.randint(0,100)/100, random.randint(0,100)/100, random.randint(0,100)/100] # from 0 to 1
-        percentage_display(percentages)
-        message = interaction.original_message()
-        message.delete()
-        await ctx.send(file=discord.File('barChart.png'), content=f"Last update at {str(time.strftime('%X'))} on day {str(time.strftime('%x'))}")
-
-    # refresh button
-    button_refresh_display = Button(label="Refresh Display", style=discord.ButtonStyle.red)
-    button_refresh_display.callback = refresh_display
-
-    display_view = View()
-    display_view.add_item(button_refresh_display)
-
-    # create and display the choice buttons
-    button1 = Button(label="A : " + answer1, style=discord.ButtonStyle.blurple)
-    button1.callback = answer_button_callback
-
-    button2 = Button(label="B : " + answer2, style=discord.ButtonStyle.blurple)
-    button1.callback = answer2_button_callback
-
-    buttons_view = View()
-    buttons_view.add_item(button1)
-    buttons_view.add_item(button2)
-    
-    await ctx.send("Question : " + question, view=buttons_view)
-
-    # image update + 1st display
-    percentages = [random.randint(0,100)/100, random.randint(0,100)/100, random.randint(0,100)/100] # from 0 to 1
-    percentage_display(percentages)
-    await ctx.send("Last update at " +str(time.strftime('%X'))+ " on date " + str(time.strftime('%x')), file=discord.File('barChart.png'), view=display_view)
+    await sondage.send_poll(ctx.interaction)
 
 bot.run(TOKEN)
