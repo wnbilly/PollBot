@@ -17,7 +17,7 @@ class Poll():
         self.answers = [answer1, answer2]
         self.display = display
 
-        self.choices = {} # les choix de chaque personne
+        self.choices = {} # dict of the choices of the users
 
         self.buttons_view = View()
 
@@ -55,8 +55,8 @@ class Poll():
     def create_callbackfunction(self, idx):
         async def callback(interaction):
             self.choices[interaction.user.id] = idx
-            print(f"{interaction.user.name} a voté {self.answers[idx]}")
-            await interaction.response.send_message(f"Tu as voté {self.answers[idx]}", ephemeral=True)
+            print(f"{interaction.user.name} voted {self.answers[idx]}")
+            await interaction.response.send_message(f"You voted {self.answers[idx]}", ephemeral=True)
 
         return callback
 
@@ -64,8 +64,8 @@ class Poll():
         await interaction.response.send_message("Question : " + self.question, view=self.buttons_view)
 
         # image update + 1st display
-        percentages = [0 for k in range(len(votes))]
+        percentages = [0 for k in range(len(self.answers))]
         percentage_display(percentages)
-        await self.ctx.send("Last update at " +str(time.strftime('%X'))+ " on date " + str(time.strftime('%x')), file=discord.File('barChart.png'), view=self.display_view)
+        await self.ctx.send(content=f"Last update at {str(time.strftime('%X'))} on day {str(time.strftime('%x'))}", file=discord.File('barChart.png'), view=self.display_view)
 
         await self.display_view.wait()

@@ -6,11 +6,11 @@ def percentage_display(percentages):
     nb_bars = len(percentages)
 
     bar_height = 60
-    height_between_bars = 25
+    height_between_bars = 20
     bar_width = 1000
 
     width_margin = 10
-    height_margin = 10
+    height_margin = 15
     image_width = bar_width + 2*width_margin
     image_height = nb_bars*(bar_height+height_between_bars) + 2*height_margin
 
@@ -50,7 +50,7 @@ def percentage_display(percentages):
         # fill the bar
         if percentages[i]!=0:
             top_left_point_fill = (width_margin+bar_outline_width, height_margin+i*bar_height+i*height_between_bars+bar_outline_width)
-            bottom_right_point_fill = ((width_margin+bar_width)*(percentages[i]), height_margin+(i+1)*bar_height+i*height_between_bars-bar_outline_width)
+            bottom_right_point_fill = ((width_margin+bar_width)*(percentages[i])-bar_outline_width, height_margin+(i+1)*bar_height+i*height_between_bars-bar_outline_width)
             xy_fill = [top_left_point_fill, bottom_right_point_fill]
 
             draw.rounded_rectangle(xy_fill, radius=radius-bar_outline_width, fill=colors_list[i], outline="white", width=fill_outline_width)
