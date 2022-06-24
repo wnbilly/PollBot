@@ -36,18 +36,19 @@ async def poll(
 
     async def answer_button_callback(interaction):
         await interaction.response.send_message("Button ")
-        nb_answer1 += 1
+        # nb_answer1 += 1
 
     async def answer2_button_callback(interaction):
-        await interaction.response.send_message("Button ")
-        await print("2")
+        #await interaction.response.send_message("Button ")
+        await interaction.response.pong()
+        print("2")
 
     async def refresh_display(interaction):
         percentages = [random.randint(0,100)/100, random.randint(0,100)/100, random.randint(0,100)/100] # from 0 to 1
         percentage_display(percentages)
-        message = interaction.original_message()
-        message.delete()
-        await ctx.send(file=discord.File('barChart.png'), content=f"Last update at {str(time.strftime('%X'))} on day {str(time.strftime('%x'))}")
+        message = interaction.message
+        await message.delete()
+        await ctx.send(file=discord.File('barChart.png'), content=f"Last update at {time.strftime('%X')} on day {time.strftime('%x')}", view=display_view)
 
     # refresh button
     button_refresh_display = Button(label="Refresh Display", style=discord.ButtonStyle.red)
@@ -61,7 +62,7 @@ async def poll(
     button1.callback = answer_button_callback
 
     button2 = Button(label="B : " + answer2, style=discord.ButtonStyle.blurple)
-    button1.callback = answer2_button_callback
+    button2.callback = answer2_button_callback
 
     buttons_view = View()
     buttons_view.add_item(button1)
@@ -70,8 +71,10 @@ async def poll(
     await ctx.send("Question : " + question, view=buttons_view)
 
     # image update + 1st display
-    percentages = [random.randint(0,100)/100, random.randint(0,100)/100, random.randint(0,100)/100] # from 0 to 1
+    percentages = [random.randint(0,100)/100, 0, random.randint(0,100)/100] # from 0 to 1
     percentage_display(percentages)
     await ctx.send("Last update at " +str(time.strftime('%X'))+ " on date " + str(time.strftime('%x')), file=discord.File('barChart.png'), view=display_view)
+
+    await display_view.wait()
 
 bot.run(TOKEN)
