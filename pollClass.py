@@ -1,3 +1,4 @@
+from email import message
 from pollBot_display import percentage_display
 
 import time
@@ -40,7 +41,7 @@ class Poll():
         self.display_view.add_item(button_refresh_display)
 
     async def refresh_display(self, interaction):
-        print(f"{interaction.user.name} a refresh")
+        print(f"{interaction.user.name} refreshed poll : "+ self.question)
 
         votes = [0 for _ in range(len(self.answers))]
         tot = 0
@@ -142,5 +143,72 @@ class Pollb(): # poll that refreshes at every vote
         percentages = [0 for k in range(len(self.answers))]
         percentage_display(percentages)
         await self.ctx.send(content=f"Last update at {str(time.strftime('%X'))} on day {str(time.strftime('%x'))}", file=discord.File('barChart.png'))
+
+        await self.display_view.wait()
+
+def extract_equal(list, value):
+    for i in 
+
+class PollWho():    # poll to know who
+
+    def __init__(
+        self,
+        ctx: discord.ApplicationContext,
+        answers: list,
+        question: str,
+        display: int
+        ):
+
+        self.ctx = ctx
+        self.question = question
+        self.answers = list(filter(None, answers)) # extract non empty answers
+        self.display = display
+
+        self.choices = {} # dict of the choices of the users
+
+        self.buttons_view = View()
+
+        for i in range(len(self.answers)):
+            button = Button(label=f"{chr(ord('@')+i+1)} : {self.answers[i]}", style=discord.ButtonStyle.blurple)
+            button.callback = self.create_callbackfunction(i)
+            self.buttons_view.add_item(button)
+
+
+    async def refresh_display(self, interaction):
+        print(f"{interaction.user.name} refreshed poll_who : "+ self.question)
+
+        message_content = self.question + " : \n"
+
+        for idx in range(len(self.answers)):
+            names_list = list(filter(, choices))
+
+        votes = [0 for _ in range(len(self.answers))]
+        tot = 0
+
+        for user_name in self.choices:
+            votes[self.choices[user_name]] += 1
+            tot += 1
+# to continue
+        if tot != 0:
+            percentages = [votes[k]/tot for k in range(len(votes))] # from 0 to 1
+
+        await interaction.message.delete()
+        await self.ctx.send(file=discord.File('barChart.png'), content=f"Last update at {str(time.strftime('%X'))} on day {str(time.strftime('%x'))}", view=self.display_view)
+
+
+    def create_callbackfunction(self, idx):
+        async def callback(interaction):
+            self.choices[interaction.user.name] = idx
+            print(f"{interaction.user.name} voted {self.answers[idx]}")
+            await interaction.response.send_message(f"You voted {self.answers[idx]}", ephemeral=True)
+            await self.refresh_display(interaction)
+
+        return callback
+
+    async def send_poll(self, interaction): # 1st display of question + answers
+        last_update = f"Last update at {time.strftime('%X')} on day {time.strftime('%x')}"
+        message_content = f"Question : " + self.question + "\n\n"
+        
+        await interaction.response.send_message(content=message_content+last_update, view=self.buttons_view)
 
         await self.display_view.wait()
