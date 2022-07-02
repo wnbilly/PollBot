@@ -58,7 +58,14 @@ class Poll():   # poll to display percentages only, no names
 
         percentage_display(percentages)
         await interaction.message.delete()
-        await self.ctx.send(file=discord.File('barChart.png'), content=f"_Last update at {str(time.strftime('%X'))} on day {str(time.strftime('%x'))}_", view=self.display_view)
+
+        message_content = f"_Last update at {time.strftime('%X')} on day {time.strftime('%x')}_\n"
+        message_content += self.question + f" :\n"
+
+        for i in range(len(self.answers)):
+            message_content += f"{chr(ord('@')+i+1)} : {self.answers[i]}\n"
+
+        await self.ctx.send(file=discord.File('barChart.png'), content=message_content, view=self.display_view)
 
 
     def create_callbackfunction(self, idx):
@@ -75,10 +82,26 @@ class Poll():   # poll to display percentages only, no names
         # image update + 1st display
         percentages = [0 for k in range(len(self.answers))]
         percentage_display(percentages)
-        await self.ctx.send(content=f"_Last update at {str(time.strftime('%X'))} on day {str(time.strftime('%x'))}_", file=discord.File('barChart.png'), view=self.display_view)
+
+        message_content = f"_Last update at {time.strftime('%X')} on day {time.strftime('%x')}_\n"
+        message_content += self.question + f" :\n"
+
+        for i in range(len(self.answers)):
+            message_content += f"{chr(ord('@')+i+1)} : {self.answers[i]}\n"
+
+        await self.ctx.send(content=message_content, file=discord.File('barChart.png'), view=self.display_view)
 
         await self.display_view.wait()
 
+
+def better_str(list):
+    better_string = ""
+    length = len(list)
+    if length>0:
+        for k in range(length-1):
+            better_string += str(list[k]) + ", "
+        better_string += str(list[length-1])
+    return better_string
 
 class PollWho():    # poll to know who and no percentages display
 
@@ -126,7 +149,7 @@ class PollWho():    # poll to know who and no percentages display
 
         for k in range(len(votes)):
             message_content += "\n" + self.answers[k] + " : " + str(len(votes[k])) + " votes\n"
-            message_content += str(votes[k]) + "\n"
+            message_content += better_str(votes[k]) + "\n"
             message_content += separator
 
 
@@ -146,7 +169,7 @@ class PollWho():    # poll to know who and no percentages display
 
     async def send_poll(self, interaction): # 1st display of question + answers
         last_update = f"_Last update at {time.strftime('%X')} on day {time.strftime('%x')}_"
-        message_content = "Question : " + str(self.question) + f"\n\n"
+        message_content = "Question : " + str(self.question) + f"\n0 votes\n"
         
         await interaction.response.send_message(content=message_content+last_update, view=self.buttons_view)
 

@@ -68,7 +68,7 @@ def percentage_display(percentages):
         bar_to_text_anchor_height = bar_height//2
         text_anchor_coords = (width_margin+bar_outline_width+bar_to_text_anchor_width, height_margin+i*bar_height+i*height_between_bars+bar_to_text_anchor_height)
 
-        in_bar_text = str(percentages[i]*100)+" %"
+        in_bar_text = f"{chr(ord('@')+i+1)} : " + str(percentages[i]*100) + " %"
         draw.text(text_anchor_coords, text=in_bar_text, fill=text_color, font=lato_font, anchor='lm', spacing=4, align='left', direction=None, features=None, language=None, stroke_width=text_outline_width, stroke_fill=text_outline_color, embedded_color=False)
     
 
