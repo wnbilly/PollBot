@@ -1,4 +1,5 @@
 from PIL import Image, ImageDraw, ImageFont
+import random
 
 
 def percentage_display(percentages):
@@ -31,11 +32,17 @@ def percentage_display(percentages):
     text_outline_width = 3
     text_outline_color = "black"
 
-    blue_pastel = (166, 199, 231, 255)
+    blue_pastel = (119, 158, 203, 255)
     red_pastel = (255, 105 ,97, 255)
     green_pastel = (119, 221, 119, 255)
+    yellow_pastel = (247, 227, 95, 255)
+    pink_pastel = (253, 108, 158, 255)
+    orange_pastel = (246, 120, 40, 255)
+    purple_pastel = (204, 169, 221, 255)
+    blue_pastel2 = (166, 199, 231, 255)
 
-    colors_list=[blue_pastel, red_pastel, green_pastel]
+    # MAX 8 ANSWERS -> 8 COLORS
+    colors_list=[blue_pastel, red_pastel, green_pastel, yellow_pastel, pink_pastel, orange_pastel, purple_pastel, blue_pastel2]
 
     for i in range(nb_bars):
 
