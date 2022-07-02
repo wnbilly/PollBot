@@ -81,7 +81,7 @@ async def poll_who(
     answers = [answer1, answer2, answer3, answer4, answer5, answer6, answer7, answer8]
     poll_who = PollWho(ctx, question, answers)
     await poll_who.send_poll(ctx.interaction)
-    await poll_who.display_view.wait()
+    await poll_who.buttons_view.wait()
 
 
 bot.run(TOKEN)

@@ -6,10 +6,11 @@ import random
 
 import discord
 from discord.ext import commands
-from discord import option, InteractionMessage, Guild
+from discord import option, InteractionMessage, Guild, Member
 from discord.ui import Button, View
 
-class Poll():
+
+class Poll():   # poll to display percentages only, no names
 
     def __init__(
         self,
@@ -31,12 +32,15 @@ class Poll():
             button.callback = self.create_callbackfunction(i)
             self.buttons_view.add_item(button)
 
+        self.buttons_view.timeout = None
+
         self.display_view = View()
 
         button_refresh_display = Button(label="Refresh Display", style=discord.ButtonStyle.red)
         button_refresh_display.callback = self.refresh_display
 
         self.display_view.add_item(button_refresh_display)
+        self.display_view.timeout = None
 
     async def refresh_display(self, interaction):
         print(f"{interaction.user.name} refreshed poll : "+ self.question)
@@ -76,7 +80,7 @@ class Poll():
         await self.display_view.wait()
 
 
-class PollWho():    # poll to know who
+class PollWho():    # poll to know who and no percentages display
 
     def __init__(
         self,
@@ -98,6 +102,7 @@ class PollWho():    # poll to know who
             button.callback = self.create_callbackfunction(i)
             self.buttons_view.add_item(button)
 
+        self.buttons_view.timeout = None
 
     async def refresh_display(self, interaction):
         print(f"{interaction.user.name} refreshed poll_who : "+ self.question)
@@ -112,17 +117,17 @@ class PollWho():    # poll to know who
 
         # EXTRACT NAMES FROM THE PERSONS WHO VOTED A CERTAIN BUTTON
         for user_id in self.choices:
-            print(user_id)
-            name = self.ctx.guild.get_member(int(user_id)).nick or self.ctx.guild.get_member(int(user_id)).name
+            member = await self.ctx.guild.fetch_member(int(user_id))
+            name = member.nick or member.name
             votes[self.choices[user_id]].append(name)
             tot += 1
 
         # add the names by choice
 
         for k in range(len(votes)):
-            content += self.answers[k] + "\n"
-            content += str(votes[k])
-            content += separator
+            message_content += "\n" + self.answers[k] + " : " + str(len(votes[k])) + " votes\n"
+            message_content += str(votes[k]) + "\n"
+            message_content += separator
 
 
         # add last update in italic to content
