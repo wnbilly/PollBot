@@ -3,8 +3,10 @@ import random
 
 
 def percentage_display(percentages):
-    
+
     nb_bars = len(percentages)
+
+    nb_digits = 2 # nb of decimals in the percentages to display
 
     bar_height = 60
     height_between_bars = 20
@@ -16,7 +18,6 @@ def percentage_display(percentages):
     image_height = nb_bars*(bar_height+height_between_bars) + 2*height_margin
 
     # (0,0) is upper-left corner
-
     image  = Image.new( mode = "RGBA", size = (image_width, image_height), color = (0,0,0,0) )
     draw = ImageDraw.Draw(image)
 
@@ -25,7 +26,6 @@ def percentage_display(percentages):
     fill_outline_width = 1
 
     # sample text and font
-
     font_size = 35
     lato_font = ImageFont.truetype("~/.share/fonts/Lato-Regular.ttf", font_size, encoding="unic")
     text_color = "white"
@@ -63,17 +63,18 @@ def percentage_display(percentages):
             draw.rounded_rectangle(xy_fill, radius=radius-bar_outline_width, fill=colors_list[i], outline="white", width=fill_outline_width)
 
         # add the percentage as text in the bar
-
         bar_to_text_anchor_width = bar_width//10
         bar_to_text_anchor_height = bar_height//2
         text_anchor_coords = (width_margin+bar_outline_width+bar_to_text_anchor_width, height_margin+i*bar_height+i*height_between_bars+bar_to_text_anchor_height)
 
-        in_bar_text = f"{chr(ord('@')+i+1)} : " + str(percentages[i]*100) + " %"
+        in_bar_text = f"{chr(ord('@')+i+1)} : " + str(round(percentages[i]*100, nb_digits)) + " %"
         draw.text(text_anchor_coords, text=in_bar_text, fill=text_color, font=lato_font, anchor='lm', spacing=4, align='left', direction=None, features=None, language=None, stroke_width=text_outline_width, stroke_fill=text_outline_color, embedded_color=False)
     
 
-
+    image.show()
     image.save("barChart.png")
+
+percentage_display([0.2548, 0.4555,0.666666])
 
 
 
