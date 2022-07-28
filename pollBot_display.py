@@ -71,10 +71,7 @@ def percentage_display(percentages):
         draw.text(text_anchor_coords, text=in_bar_text, fill=text_color, font=lato_font, anchor='lm', spacing=4, align='left', direction=None, features=None, language=None, stroke_width=text_outline_width, stroke_fill=text_outline_color, embedded_color=False)
     
 
-    image.show()
     image.save("barChart.png")
-
-percentage_display([0.2548, 0.4555,0.666666])
 
 
 

@@ -1,4 +1,3 @@
-from email import message
 from pollBot_display import percentage_display
 
 import time
@@ -78,6 +77,23 @@ class Poll():   # poll to display percentages only, no names
 
     async def send_poll(self, interaction):
         await interaction.response.send_message("Question : " + self.question, view=self.buttons_view)
+
+        # image update + 1st display
+        percentages = [0 for k in range(len(self.answers))]
+        percentage_display(percentages)
+
+        message_content = f"_Last update at {time.strftime('%X')} on day {time.strftime('%x')}_\n"
+        message_content += self.question + f" :\n"
+
+        for i in range(len(self.answers)):
+            message_content += f"{chr(ord('@')+i+1)} : {self.answers[i]}\n"
+
+        await self.ctx.send(content=message_content, file=discord.File('barChart.png'), view=self.display_view)
+
+        await self.display_view.wait()
+
+    async def send_poll_modal(self, ctx):
+        await ctx.send("Question : " + self.question, view=self.buttons_view)
 
         # image update + 1st display
         percentages = [0 for k in range(len(self.answers))]
@@ -174,3 +190,42 @@ class PollWho():    # poll to know who and no percentages display
         await interaction.response.send_message(content=message_content+last_update, view=self.buttons_view)
 
         await self.buttons_view.wait()
+
+class PollFillingModal(discord.ui.Modal):
+    def __init__(self, ctx:discord.ApplicationContext, *args, **kwargs) -> None:
+        super().__init__(
+            discord.ui.InputText(
+                label="Question",
+                placeholder="Enter your question",
+                style=discord.InputTextStyle.long
+            ),
+            discord.ui.InputText(
+                label="Answer 1",
+                style=discord.InputTextStyle.long
+            ),
+            discord.ui.InputText(
+                label="Answer 2",
+                style=discord.InputTextStyle.long
+            ),
+            discord.ui.InputText(
+                label="Answer 3",
+                style=discord.InputTextStyle.long,
+                required=False
+            ),
+            discord.ui.InputText(
+                label="Answer 4",
+                style=discord.InputTextStyle.long,
+                required=False
+            ),
+            *args,
+            **kwargs,)
+        self.ctx = ctx
+        self.question = ""
+        self.answers = []
+
+    async def callback(self, interaction: discord.Interaction):
+            self.question=self.children[0].value
+            self.answers = [self.children[i].value for i in range(1,5)] # only 4 answers possible at the moment 
+            poll = Poll(self.ctx, self.question, self.answers)
+            await poll.send_poll_modal(self.ctx)
+            await poll.display_view.wait()

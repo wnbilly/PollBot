@@ -6,9 +6,9 @@ import random
 
 import discord
 from discord.ext import commands
-from discord import option, InteractionMessage
+from discord import option, InteractionMessage, ApplicationCommand, MessageCommand
 from discord.ui import Button, View
-from pollClass import Poll, PollWho
+from pollClass import Poll, PollWho, PollFillingModal
 from pollBot_display import percentage_display
 
 TOKEN = "OTg5NDMzNTc5NzczNzc1OTAy.GlW4V9.9q1SrWh2h9qLu0OmPbTuwqeL7BgEFKhrm96p5I"
@@ -16,7 +16,7 @@ TOKEN = "OTg5NDMzNTc5NzczNzc1OTAy.GlW4V9.9q1SrWh2h9qLu0OmPbTuwqeL7BgEFKhrm96p5I"
 bot = discord.Bot(command_prefix="+")
 @bot.event
 async def on_ready():
-    print(f"PollBot ready via {bot.user}.")
+    print(f"{bot.user} ready.")
 
 
 # poll command, callable via /poll "question" "answer1" "answer2"
@@ -84,4 +84,13 @@ async def poll_who(
     await poll_who.buttons_view.wait()
 
 
+# poll message command, callable via message context menus
+@bot.message_command(name="Create a poll", description="Create a poll via a modal")
+async def poll_app_command(
+    ctx: discord.ApplicationContext,
+    msg: discord.Message
+):
+    modal = PollFillingModal(title="Poll Filling Modal", ctx=ctx)
+    await ctx.interaction.response.send_modal(modal)
+    print(f"{ctx.interaction.user.name} created a poll via menu : " + modal.question)
 bot.run(TOKEN)
