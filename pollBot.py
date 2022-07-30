@@ -8,7 +8,7 @@ import discord
 from discord.ext import commands
 from discord import option, InteractionMessage, ApplicationCommand, MessageCommand
 from discord.ui import Button, View
-from pollClass import Poll, PollWho, PollFillingModal
+from pollClass import Poll, PollWho, PollFillingModal, PollWhoFillingModal
 from pollBot_display import percentage_display
 
 TOKEN = "OTg5NDMzNTc5NzczNzc1OTAy.GlW4V9.9q1SrWh2h9qLu0OmPbTuwqeL7BgEFKhrm96p5I"
@@ -80,7 +80,7 @@ async def poll_who(
     print(f"{ctx.interaction.user.name} created a pollWho : " + question)
     answers = [answer1, answer2, answer3, answer4, answer5, answer6, answer7, answer8]
     poll_who = PollWho(ctx, question, answers)
-    await poll_who.send_poll(ctx.interaction)
+    await poll_who.send_poll()
     await poll_who.buttons_view.wait()
 
 
@@ -94,20 +94,6 @@ async def poll_app_command(
     
     await ctx.interaction.response.send_modal(modal)
 
-    while modal.question == "":
-        time.sleep(1)
-        print("Waiting...")
-    
-    print("Done !")
-    
-    print(modal.question) # ERROR HERE : code does not wait for the modal to be sent
-
-    poll = Poll(ctx, modal.question, modal.answers)
-    print(f"{ctx.interaction.user.name} created a poll via menu : " + modal.question)
-
-    await poll.send_poll_modal(ctx)
-    await poll.display_view.wait()
-
 
 # poll_who message command, callable via message context menus
 @bot.message_command(name="Create a poll_who", description="Create a poll with a names display via a modal")
@@ -115,8 +101,8 @@ async def poll_who_app_command(
     ctx: discord.ApplicationContext,
     msg: discord.Message
 ):
-    modal = PollFillingModal(title="Poll Filling Modal", ctx=ctx)
+    modal = PollWhoFillingModal(title="Poll Filling Modal", ctx=ctx)
+
     await ctx.interaction.response.send_modal(modal)
-    print(f"{ctx.interaction.user.name} created a poll via menu : " + modal.question)
 
 bot.run(TOKEN)
