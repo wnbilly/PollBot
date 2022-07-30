@@ -224,8 +224,7 @@ class PollFillingModal(discord.ui.Modal):
         self.answers = []
 
     async def callback(self, interaction: discord.Interaction):
-            self.question=self.children[0].value
-            self.answers = [self.children[i].value for i in range(1,5)] # only 4 answers possible at the moment 
-            poll = Poll(self.ctx, self.question, self.answers)
-            await poll.send_poll_modal(self.ctx)
-            await poll.display_view.wait()
+        print("Callback done :"+self.children[0].value)
+        self.question = self.children[0].value
+        self.answers = [self.children[i].value for i in range(1,5)] # only 4 answers possible at the moment 
+            
