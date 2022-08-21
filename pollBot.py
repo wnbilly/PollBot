@@ -48,7 +48,7 @@ async def poll(
     print(f"{ctx.interaction.user.name} created a poll : " + question)
     answers = [answer1, answer2, answer3, answer4, answer5, answer6, answer7, answer8]
     poll = Poll(ctx, question, answers)
-    await poll.send_poll(ctx.interaction)
+    await poll.send_poll() # ctx.interaction 
     await poll.display_view.wait()
 
 # poll command, callable via /poll_who "question"
