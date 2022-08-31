@@ -31,6 +31,9 @@ class Poll():   # poll to display percentages only, no names
             button.callback = self.create_callbackfunction(i)
             self.buttons_view.add_item(button)
 
+        cancel_button = Button(label=f"{chr(ord('@')+len(self.answers)+1)} : Cancel", style=discord.ButtonStyle.red)
+        cancel_button.callback = self.cancel_callback
+        self.buttons_view.add_item(cancel_button)
         self.buttons_view.timeout = None
 
         self.display_view = View()
@@ -42,8 +45,7 @@ class Poll():   # poll to display percentages only, no names
         self.display_view.timeout = None
 
     async def refresh_display(self, interaction):
-        print(f"{interaction.user.name} refreshed poll : "+ self.question)
-
+        print(f"{time.strftime('%X')} on day {time.strftime('%x')} : {interaction.user.name} refrshed display of poll {self.question}")
         votes = [0 for _ in range(len(self.answers))]
         tot = 0
 
@@ -70,12 +72,20 @@ class Poll():   # poll to display percentages only, no names
     def create_callbackfunction(self, idx):
         async def callback(interaction):
             self.choices[interaction.user.id] = idx
-            print(f"{interaction.user.name} voted {self.answers[idx]}")
+            print(f"{time.strftime('%X')} on day {time.strftime('%x')} : {interaction.user.name} answered {self.answers[idx]} to {self.question}")
             await interaction.response.send_message(f"You voted {self.answers[idx]}", ephemeral=True)
 
         return callback
 
-    async def send_poll(self):
+    async def cancel_callback(self, interaction):
+        vote_idx = self.choices[interaction.user.id]
+        print(f"{time.strftime('%X')} on day {time.strftime('%x')} : {interaction.user.name} cancelled their vote {self.answers[vote_idx]} for poll {self.question}")
+
+        del self.choices[interaction.user.id]
+        await interaction.response.send_message(f"You cancelled your vote for {self.answers[vote_idx]}", ephemeral=True)
+
+
+    async def send_poll(self, *args, **kwargs):
         await self.ctx.send("Question : " + self.question, view=self.buttons_view)
 
         # image update + 1st display
@@ -124,10 +134,13 @@ class PollWho():    # poll to know who and no percentages display
             button.callback = self.create_callbackfunction(i)
             self.buttons_view.add_item(button)
 
+        cancel_button = Button(label=f"{chr(ord('@')+len(self.answers)+1)} : Cancel", style=discord.ButtonStyle.red)
+        cancel_button.callback = self.cancel_callback
+        self.buttons_view.add_item(cancel_button)
         self.buttons_view.timeout = None
 
     async def refresh_display(self, interaction):
-        print(f"{interaction.user.name} refreshed poll_who : "+ self.question)
+        # print(f"{time.strftime('%X')} on day {time.strftime('%x')} : {interaction.user.name} refreshed poll_who : "+ self.question)
 
         message_content = str(self.question) + f" : \n"        
         
@@ -145,7 +158,6 @@ class PollWho():    # poll to know who and no percentages display
             tot += 1
 
         # add the names by choice
-
         for k in range(len(votes)):
             message_content += "\n" + self.answers[k] + " : " + str(len(votes[k])) + " votes\n"
             message_content += better_str(votes[k]) + "\n"
@@ -160,11 +172,21 @@ class PollWho():    # poll to know who and no percentages display
     def create_callbackfunction(self, idx):
         async def callback(interaction):
             self.choices[interaction.user.id] = idx
-            print(f"{interaction.user.name} voted {self.answers[idx]}")
+            print(f"{time.strftime('%X')} on day {time.strftime('%x')} : {interaction.user.name} answered {self.answers[idx]} to {self.question}")
             # await interaction.response.send_message(f"You voted {self.answers[idx]}", ephemeral=True)
+            await interaction.response.defer()
             await self.refresh_display(interaction)
 
         return callback
+
+    async def cancel_callback(self, interaction):
+        vote_idx = self.choices[interaction.user.id]
+        print(f"{time.strftime('%X')} on day {time.strftime('%x')} : {interaction.user.name} cancelled their vote {self.answers[vote_idx]} for poll {self.question}")
+
+        del self.choices[interaction.user.id]
+        await interaction.response.defer() # to avoid "This interaction failed." error
+        await self.refresh_display(interaction)
+
 
     async def send_poll(self): # 1st display of question + answers
         last_update = f"_Last update at {time.strftime('%X')} on day {time.strftime('%x')}_"

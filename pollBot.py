@@ -10,6 +10,7 @@ from discord import option, InteractionMessage, ApplicationCommand, MessageComma
 from discord.ui import Button, View
 from pollClass import Poll, PollWho, PollFillingModal, PollWhoFillingModal
 from pollBot_display import percentage_display
+from reactClass import React
 
 TOKEN = "OTg5NDMzNTc5NzczNzc1OTAy.GlW4V9.9q1SrWh2h9qLu0OmPbTuwqeL7BgEFKhrm96p5I"
 
@@ -104,5 +105,12 @@ async def poll_who_app_command(
     modal = PollWhoFillingModal(title="Poll Filling Modal", ctx=ctx)
 
     await ctx.interaction.response.send_modal(modal)
+
+# react a text with discord reactions via the message menu
+@bot.message_command(name="React")
+async def react_callback(ctx: discord.ApplicationContext, msg: discord.Message):
+    print(f"{time.strftime('%X')} on day {time.strftime('%x')} : {ctx.user.name} reacted to the message {msg.id}")
+    react = React()
+    await react.response(ctx, msg)
 
 bot.run(TOKEN)
