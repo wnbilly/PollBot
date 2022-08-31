@@ -109,7 +109,6 @@ async def poll_who_app_command(
 # react a text with discord reactions via the message menu
 @bot.message_command(name="React")
 async def react_callback(ctx: discord.ApplicationContext, msg: discord.Message):
-    print(f"{time.strftime('%X')} on day {time.strftime('%x')} : {ctx.user.name} reacted to the message {msg.id}")
     react = React()
     await react.response(ctx, msg)
 

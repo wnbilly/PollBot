@@ -55,11 +55,11 @@ class React():
         modal = discord.ui.Modal(title=f"Modal for text entry")
         input = discord.ui.InputText(label="Enter the text to turn into reactions")
         modal.add_item(input)
-        await ctx.send_modal(modal)
+        # await ctx.send_modal(modal)
+        await ctx.interaction.response.send_modal(modal)
         await modal.wait()
-        # await ctx.interaction.response.send_modal(modal)
         text = input.value
-
+        print(f"{time.strftime('%X')} on day {time.strftime('%x')} : {ctx.user.name} reacted {text} to the message {msg.id}")
         reaction_emojis = self.str_to_emojis(text)
         for i in range(len(reaction_emojis)):
             await msg.add_reaction(reaction_emojis[i])
