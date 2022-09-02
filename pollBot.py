@@ -97,12 +97,12 @@ async def poll_app_command(
 
 
 # poll_who message command, callable via message context menus
-@bot.message_command(name="Create a poll_who", description="Create a poll with a names display via a modal")
+@bot.message_command(name="Create a pollWho", description="Create a poll with a names display via a modal")
 async def poll_who_app_command(
     ctx: discord.ApplicationContext,
     msg: discord.Message
 ):
-    modal = PollWhoFillingModal(title="Poll Filling Modal", ctx=ctx)
+    modal = PollWhoFillingModal(title="PollWho Filling Modal", ctx=ctx)
 
     await ctx.interaction.response.send_modal(modal)
 
@@ -111,5 +111,15 @@ async def poll_who_app_command(
 async def react_callback(ctx: discord.ApplicationContext, msg: discord.Message):
     react = React()
     await react.response(ctx, msg)
+
+@bot.message_command(name="React cancel")
+async def react_cancel_callback(ctx: discord.ApplicationContext, msg: discord.Message):
+    response_content = ""
+    for reaction in msg.reactions :
+        print(reaction.emoji)
+        await reaction.remove(bot.user)
+        response_content += f"{reaction.emoji} "
+    await ctx.interaction.response.send_message(content=f"Reaction {response_content} cancelled.", ephemeral=True)
+    print(f"{time.strftime('%X')} on day {time.strftime('%x')} : {ctx.user.name} cancelled the reaction {response_content} to the message {msg.id}")
 
 bot.run(TOKEN)
