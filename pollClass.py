@@ -104,7 +104,7 @@ class Poll():   # poll to display percentages only, no names
 
 
 def better_str(list):
-    better_string = ""
+    better_string = "> "
     length = len(list)
     if length>0:
         for k in range(length-1):
@@ -142,11 +142,6 @@ class PollWho():    # poll to know who and no percentages display
     async def refresh_display(self, interaction):
         # print(f"{time.strftime('%X')} on day {time.strftime('%x')} : {interaction.user.name} refreshed poll_who : "+ self.question)
 
-        message_content = str(self.question) + f" : \n"        
-        
-        separator = "--------------"
-        message_content += separator
-
         tot = 0
         votes = [[] for _ in range(len(self.answers))]
 
@@ -157,17 +152,16 @@ class PollWho():    # poll to know who and no percentages display
             votes[self.choices[user_id]].append(name)
             tot += 1
 
-        # add the names by choice
-        for k in range(len(votes)):
-            message_content += "\n" + self.answers[k] + " : " + str(len(votes[k])) + " votes\n"
-            message_content += better_str(votes[k]) + "\n"
-            message_content += separator
-
+        embed = discord.Embed(
+            title=f"Question : {self.question} ({str(tot)} votes)",
+            fields=[discord.EmbedField(name=f"{self.answers[k]} : {str(len(votes[k]))} votes", value=f"{better_str(votes[k])}", inline=False) for k in range(len(votes))],
+            color=discord.Color.random(),
+            )
 
         # add last update in italic to content
-        message_content += f"\n_Last update at {time.strftime('%X')} on day {time.strftime('%x')}_"
-        await interaction.message.edit(content=message_content)
-
+        message_content = f"\n_Last update at {time.strftime('%X')} on day {time.strftime('%x')}_"
+        # await interaction.message.edit(content=message_content)
+        await interaction.message.edit(content=message_content, embeds=[embed])
 
     def create_callbackfunction(self, idx):
         async def callback(interaction):
@@ -189,10 +183,15 @@ class PollWho():    # poll to know who and no percentages display
 
 
     async def send_poll(self): # 1st display of question + answers
-        last_update = f"_Last update at {time.strftime('%X')} on day {time.strftime('%x')}_"
-        message_content = "Question : " + str(self.question) + f"\n0 votes\n"
+        message_content = f"_Last update at {time.strftime('%X')} on day {time.strftime('%x')}_"
         
-        await self.ctx.send(content=message_content+last_update, view=self.buttons_view)
+        embed = discord.Embed(
+            title=f"Question : {self.question} (0 vote)",
+            fields=[discord.EmbedField(name=f"{self.answers[k]} : 0 vote", value=f"> ", inline=False) for k in range(len(self.answers))],
+            color=discord.Color.random(),
+            )
+
+        await self.ctx.send(embeds=[embed], content=message_content, view=self.buttons_view)
 
         await self.buttons_view.wait()
 
