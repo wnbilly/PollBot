@@ -115,11 +115,15 @@ async def react_callback(ctx: discord.ApplicationContext, msg: discord.Message):
 @bot.message_command(name="React cancel")
 async def react_cancel_callback(ctx: discord.ApplicationContext, msg: discord.Message):
     response_content = ""
-    for reaction in msg.reactions :
-        print(reaction.emoji)
-        await reaction.remove(bot.user)
+
+    # 2 LOOPS TO AVOID INTERACTION ALREADY RESPONDED TO WHEN TOO MANY REACTIONS (ctx.interaction.response.defer() not working here)
+    for reaction in msg.reactions: # loop to get the emojis and make the message
         response_content += f"{reaction.emoji} "
+    
     await ctx.interaction.response.send_message(content=f"Reaction {response_content} cancelled.", ephemeral=True)
     print(f"{time.strftime('%X')} on day {time.strftime('%x')} : {ctx.user.name} cancelled the reaction {response_content} to the message {msg.id}")
+    for reaction in msg.reactions: # loop to remove the reactions
+        await reaction.remove(bot.user)
+
 
 bot.run(TOKEN)

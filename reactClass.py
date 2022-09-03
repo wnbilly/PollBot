@@ -15,27 +15,48 @@ class React():
     ):
         self.ctx = ctx
 
+    def string_adaptation(self, str):
+        new_str=str[0]
+        for i in range(1,len(str)):
+            if str[i] in str[:i]:
+                if str[i]==' ':
+                    new_str += '_'
+                else:
+                    new_str += str[i].upper()
+            else:
+                new_str += str[i]
+        return new_str
+
+
     # for emoji list : https://emojipedia.org/twitter/
     def str_to_emojis(self, str):
         letter_emojis_dict={
             'a':'🇦', # letters
+            'A':'🅰️',
             'b':'🇧', 
-            'c':'🇨', 
+            'B':'🅱️',
+            'c':'🇨',
+            'C':'©️',
             'd':'🇩',
             'e':'🇪',
             'f':'🇫',
             'g':'🇬',
             'h':'🇭',
             'i':'🇮',
+            'I':'ℹ️',
             'j':'🇯',
             'k':'🇰',
             'l':'🇱',
             'm':'🇲',
+            'M':'Ⓜ️',
             'n':'🇳',
             'o':'🇴',
+            'O':'🅾️',
             'p':'🇵',
+            'P':'🅿️',
             'q':'🇶',
             'r':'🇷',
+            'R':'®️',
             's':'🇸',
             't':'🇹',
             'u':'🇺',
@@ -45,6 +66,7 @@ class React():
             'y':'🇾',
             'z':'🇿',
             ' ':'▪️', # space
+            '_':'◼️', # up to 2 spaces for now
             '0':'0️⃣', # numbers
             '1':'1️⃣',
             '2':'2️⃣',
@@ -55,12 +77,18 @@ class React():
             '7':'7️⃣',
             '8':'8️⃣',
             '9':'9️⃣',
-            '10':'🔟'
+            '10':'🔟',
+            '?':'❓', # miscaellenous
+            '!':'❗',
+            '+':'➕',
+            '-':'➖',
+            '=':'🟰'
             }
         emojis=[]
         str = str.lower() # uppercase to lowercase
+        str = self.string_adaptation(str)
         for i in range(len(str)):
-            if str[i] in letter_emojis_dict :
+            if str[i] in letter_emojis_dict:
                 emojis.append(letter_emojis_dict[str[i]])
         return emojis
 
