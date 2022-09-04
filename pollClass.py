@@ -188,7 +188,7 @@ class PollWho():    # poll to know who and no percentages display
         embed = discord.Embed(
             title=f"Question : {self.question} (0 vote)",
             fields=[discord.EmbedField(name=f"{self.answers[k]} : 0 vote", value=f"> ", inline=False) for k in range(len(self.answers))],
-            color=discord.Color.random(),
+            color=discord.Color.random()
             )
 
         await self.ctx.send(embeds=[embed], content=message_content, view=self.buttons_view)
