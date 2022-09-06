@@ -60,13 +60,16 @@ class Poll():   # poll to display percentages only, no names
         percentage_display(percentages)
         await interaction.message.delete()
 
-        message_content = f"_Last update at {time.strftime('%X')} on day {time.strftime('%x')}_\n"
-        message_content += self.question + f" :\n"
+        embed = discord.Embed(
+            title=f"Question : {self.question} ({str(tot)} votes)",
+            fields=[discord.EmbedField(name=f"{chr(ord('@')+k+1)} : {self.answers[k]}", value=f"{str(percentages[k])}", inline=False) for k in range(len(votes))],
+            color=discord.Color.random(),
+            )
 
-        for i in range(len(self.answers)):
-            message_content += f"{chr(ord('@')+i+1)} : {self.answers[i]}\n"
+        # add last update in italic to content
+        message_content = f"\n_Last update at {time.strftime('%X')} on day {time.strftime('%x')}_"
 
-        await self.ctx.send(file=discord.File('barChart.png'), content=message_content, view=self.display_view)
+        await self.ctx.send(file=discord.File('barChart.png'), embeds=[embed], content=message_content, view=self.display_view)
 
 
     def create_callbackfunction(self, idx):
