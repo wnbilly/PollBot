@@ -138,7 +138,7 @@ class PollWho():    # poll to know who and no percentages display
             self.buttons_view.add_item(button)
 
         add_answer_button = Button(label=f"{chr(ord('@')+len(self.answers)+1)} : Add answer", style=discord.ButtonStyle.green)
-        add_answer_button.callback = self.cancel_callback
+        add_answer_button.callback = self.add_answer_callback
         self.buttons_view.add_item(add_answer_button)
 
         cancel_button = Button(label=f"{chr(ord('@')+len(self.answers)+2)} : Cancel my answer", style=discord.ButtonStyle.red)
@@ -181,7 +181,7 @@ class PollWho():    # poll to know who and no percentages display
         return callback
 
     async def add_answer_callback(self, interaction):
-        modal = discord.ui.modal()
+        modal = discord.ui.Modal(title=f'Modal for answer entry')
         input = discord.ui.InputText(
             label="Write the answer to add to the poll",
             placeholder="Type your new answer...",
