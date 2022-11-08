@@ -137,7 +137,7 @@ class PollWho():    # poll to know who and no percentages display
             button.callback = self.create_callbackfunction(i)
             self.buttons_view.add_item(button)
 
-        add_answer_button = Button(label=f"Add answer", style=discord.ButtonStyle.green)
+        add_answer_button = Button(label=f"Add an answer", style=discord.ButtonStyle.green)
         add_answer_button.callback = self.add_answer_callback
         self.buttons_view.add_item(add_answer_button)
 
