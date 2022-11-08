@@ -213,6 +213,7 @@ class PollWho():    # poll to know who and no percentages display
             self.buttons_view.add_item(add_answer_button)
             self.buttons_view.add_item(cancel_button)
 
+            print(f"{time.strftime('%X')} on day {time.strftime('%x')} : {interaction.user.name} added the answer {self.answers[-1]} to {self.question}")
             await self.refresh_display(interaction)
 
     async def cancel_callback(self, interaction):
