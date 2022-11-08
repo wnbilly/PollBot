@@ -31,7 +31,7 @@ class Poll():   # poll to display percentages only, no names
             button.callback = self.create_callbackfunction(i)
             self.buttons_view.add_item(button)
 
-        cancel_button = Button(label=f"{chr(ord('@')+len(self.answers)+1)} : Cancel", style=discord.ButtonStyle.red)
+        cancel_button = Button(label=f"Cancel", style=discord.ButtonStyle.red)
         cancel_button.callback = self.cancel_callback
         self.buttons_view.add_item(cancel_button)
         self.buttons_view.timeout = None
@@ -137,11 +137,11 @@ class PollWho():    # poll to know who and no percentages display
             button.callback = self.create_callbackfunction(i)
             self.buttons_view.add_item(button)
 
-        add_answer_button = Button(label=f"{chr(ord('@')+len(self.answers)+1)} : Add answer", style=discord.ButtonStyle.green)
+        add_answer_button = Button(label=f"Add answer", style=discord.ButtonStyle.green)
         add_answer_button.callback = self.add_answer_callback
         self.buttons_view.add_item(add_answer_button)
 
-        cancel_button = Button(label=f"{chr(ord('@')+len(self.answers)+2)} : Cancel my answer", style=discord.ButtonStyle.red)
+        cancel_button = Button(label=f"Cancel my answer", style=discord.ButtonStyle.red)
         cancel_button.callback = self.cancel_callback
         self.buttons_view.add_item(cancel_button)
         self.buttons_view.timeout = None
@@ -168,7 +168,7 @@ class PollWho():    # poll to know who and no percentages display
         # add last update in italic to content
         message_content = f"\n_Last update at {time.strftime('%X')} on day {time.strftime('%x')}_"
         # await interaction.message.edit(content=message_content)
-        await interaction.message.edit(content=message_content, embeds=[embed])
+        await interaction.message.edit(content=message_content, embeds=[embed], view=self.buttons_view)
 
     def create_callbackfunction(self, idx):
         async def callback(interaction):
@@ -181,19 +181,39 @@ class PollWho():    # poll to know who and no percentages display
         return callback
 
     async def add_answer_callback(self, interaction):
-        modal = discord.ui.Modal(title=f'Modal for answer entry')
-        input = discord.ui.InputText(
-            label="Write the answer to add to the poll",
-            placeholder="Type your new answer...",
-            style=discord.InputTextStyle.short
-        )
-        modal.add_item(input)
-        # await ctx.send_modal(modal)
-        await interaction.response.send_modal(modal)
-        await modal.wait()
-        new_answer = input.value
-        self.answers.append(new_answer)
-        await self.refresh_display(interaction)
+        
+        if (len(self.answers)>=23):
+            await interaction.response.send_message(content=f"No more answers allowed.", ephemeral=True)
+        else :
+            modal = discord.ui.Modal(title=f'Modal for answer entry')
+            input = discord.ui.InputText(
+                label="Write the answer to add to the poll",
+                placeholder="Type your new answer...",
+                style=discord.InputTextStyle.short
+            )
+            modal.add_item(input)
+            # await ctx.send_modal(modal)
+            await interaction.response.send_modal(modal)
+            await modal.wait()
+            new_answer = input.value
+            self.answers.append(new_answer)
+
+            # remove add_answer_button and cancel_button
+            cancel_button = self.buttons_view.children[-1]
+            self.buttons_view.remove_item(self.buttons_view.children[-1])
+            add_answer_button = self.buttons_view.children[-1]
+            self.buttons_view.remove_item(self.buttons_view.children[-1])
+
+            # add new button to the view
+            button = Button(label=f"{chr(ord('@')+len(self.answers))} : {self.answers[-1]}", style=discord.ButtonStyle.blurple)
+            button.callback = self.create_callbackfunction(len(self.answers)-1)
+            self.buttons_view.add_item(button)
+
+            # add add_answer_button and cancel_button
+            self.buttons_view.add_item(add_answer_button)
+            self.buttons_view.add_item(cancel_button)
+
+            await self.refresh_display(interaction)
 
     async def cancel_callback(self, interaction):
         vote_idx = self.choices[interaction.user.id]
@@ -273,7 +293,8 @@ class PollWhoFillingModal(discord.ui.Modal):
             ),
             discord.ui.InputText(
                 label="Answer 2",
-                style=discord.InputTextStyle.long
+                style=discord.InputTextStyle.long,
+                required=False
             ),
             discord.ui.InputText(
                 label="Answer 3",
