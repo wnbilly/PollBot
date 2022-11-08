@@ -146,8 +146,10 @@ class PollWho():    # poll to know who and no percentages display
         self.buttons_view.add_item(cancel_button)
         self.buttons_view.timeout = None
 
+        print(f"{time.strftime('%X')} on day {time.strftime('%x')} : {ctx.interaction.user.name} created a pollWho : " + question)
+
     async def refresh_display(self, interaction):
-        # print(f"{time.strftime('%X')} on day {time.strftime('%x')} : {interaction.user.name} refreshed poll_who : "+ self.question)
+        print(f"{time.strftime('%X')} on day {time.strftime('%x')} : {interaction.user.name} refreshed poll_who : "+ self.question)
 
         tot = 0
         votes = [[] for _ in range(len(self.answers))]
