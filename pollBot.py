@@ -78,7 +78,7 @@ async def poll_who(
     answer8: str,
     display: int,
 ):
-    print(f"{ctx.interaction.user.name} created a pollWho : " + question)
+    print(f"{time.strftime('%X')} on day {time.strftime('%x')} :{ctx.interaction.user.name} created a pollWho : " + question)
     answers = [answer1, answer2, answer3, answer4, answer5, answer6, answer7, answer8]
     poll_who = PollWho(ctx, question, answers)
     await poll_who.send_poll()
