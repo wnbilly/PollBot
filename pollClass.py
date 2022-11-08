@@ -137,7 +137,11 @@ class PollWho():    # poll to know who and no percentages display
             button.callback = self.create_callbackfunction(i)
             self.buttons_view.add_item(button)
 
-        cancel_button = Button(label=f"{chr(ord('@')+len(self.answers)+1)} : Cancel", style=discord.ButtonStyle.red)
+        add_answer_button = Button(label=f"{chr(ord('@')+len(self.answers)+1)} : Add answer", style=discord.ButtonStyle.green)
+        add_answer_button.callback = self.cancel_callback
+        self.buttons_view.add_item(add_answer_button)
+
+        cancel_button = Button(label=f"{chr(ord('@')+len(self.answers)+2)} : Cancel my answer", style=discord.ButtonStyle.red)
         cancel_button.callback = self.cancel_callback
         self.buttons_view.add_item(cancel_button)
         self.buttons_view.timeout = None
@@ -175,6 +179,21 @@ class PollWho():    # poll to know who and no percentages display
             await self.refresh_display(interaction)
 
         return callback
+
+    async def add_answer_callback(self, interaction):
+        modal = discord.ui.modal()
+        input = discord.ui.InputText(
+            label="Write the answer to add to the poll",
+            placeholder="Type your new answer...",
+            style=discord.InputTextStyle.short
+        )
+        modal.add_item(input)
+        # await ctx.send_modal(modal)
+        await interaction.response.send_modal(modal)
+        await modal.wait()
+        new_answer = input.value
+        self.answers.append(new_answer)
+        await self.refresh_display(interaction)
 
     async def cancel_callback(self, interaction):
         vote_idx = self.choices[interaction.user.id]
