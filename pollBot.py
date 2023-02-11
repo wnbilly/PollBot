@@ -132,15 +132,6 @@ try:
         for reaction in msg.reactions: # loop to remove the reactions
             await reaction.remove(bot.user)
 
-    # react asian emojis to show misunderstanding
-    @bot.message_command(name="ze du chinois")
-    async def chinois_callback(ctx: discord.ApplicationContext, msg: discord.Message):
-        await msg.add_reaction('🈹')
-        await msg.add_reaction('🈲')
-        await msg.add_reaction('🈵')
-        # await msg.add_reaction('㊗️')
-        # await msg.add_reaction('㊙️')
-        # await msg.add_reaction('🉐')
 
     bot.run(TOKEN)
 
