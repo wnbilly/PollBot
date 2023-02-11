@@ -101,7 +101,13 @@ class React():
         await ctx.interaction.response.send_modal(modal)
         await modal.wait()
         text = input.value
+
+        response_content = "" # to answer the interaction
+
+        
         print(f"{time.strftime('%X')} on day {time.strftime('%x')} : {ctx.user.name} reacted {text} to the message {msg.id}")
         reaction_emojis = self.str_to_emojis(text)
         for i in range(len(reaction_emojis)):
             await msg.add_reaction(reaction_emojis[i])
+            response_content += f"{reaction_emojis[i]} "
+        await ctx.interaction.response.send_message(content=f"Reaction {response_content} cancelled.", ephemeral=True, delete_after=1)

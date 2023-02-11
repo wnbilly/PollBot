@@ -1,7 +1,6 @@
-from pollBot_display import percentage_display
-
 import time
 import random
+# import json
 
 import discord
 from discord.ext import commands
@@ -44,8 +43,10 @@ class Poll():   # poll to display percentages only, no names
         self.display_view.add_item(button_refresh_display)
         self.display_view.timeout = None
 
+
     async def refresh_display(self, interaction):
-        print(f"{time.strftime('%X')} on day {time.strftime('%x')} : {interaction.user.name} refrshed display of poll {self.question}")
+        print(f"{time.strftime('%X')} on day {time.strftime('%x')} : {interaction.user.name} refreshed poll : "+ self.question)
+
         votes = [0 for _ in range(len(self.answers))]
         tot = 0
 
@@ -55,28 +56,27 @@ class Poll():   # poll to display percentages only, no names
 
         percentages = [0 for k in range(len(votes))]
         if tot != 0:
-            percentages = [votes[k]/tot for k in range(len(votes))] # from 0 to 1
+            percentages = [votes[k]/tot for k in range(len(votes))] # from 0 to 100 with no decimals
 
-        percentage_display(percentages)
-        await interaction.message.delete()
+        nb_bar = 35 # the total amount of / to be distributed among the percentages
 
         embed = discord.Embed(
-            title=f"Question : {self.question} ({str(tot)} votes)",
-            fields=[discord.EmbedField(name=f"{chr(ord('@')+k+1)} : {self.answers[k]}", value=f"{str(percentages[k])}", inline=False) for k in range(len(votes))],
+            title=f"Question : {self.question} ({str(tot)} vote"+(tot>1)*"s"+")",
+            fields=[discord.EmbedField(name=f"{self.answers[k]} : {str(votes[k])} vote"+(votes[k]>1)*"s", value="**|**"+"/"*int(percentages[k]*nb_bar)+(int(percentages[k]*nb_bar)>0)*"**/**"+f" {int(percentages[k]*100)} %", inline=False) for k in range(len(votes))],
             color=discord.Color.random(),
             )
 
         # add last update in italic to content
         message_content = f"\n_Last update at {time.strftime('%X')} on day {time.strftime('%x')}_"
-
-        await self.ctx.send(file=discord.File('barChart.png'), embeds=[embed], content=message_content, view=self.display_view)
-
+        # await interaction.message.edit(content=message_content)
+        await interaction.message.edit(content=message_content, embeds=[embed], view=self.buttons_view)
 
     def create_callbackfunction(self, idx):
         async def callback(interaction):
             self.choices[interaction.user.id] = idx
             print(f"{time.strftime('%X')} on day {time.strftime('%x')} : {interaction.user.name} answered {self.answers[idx]} to {self.question}")
-            await interaction.response.send_message(f"You voted {self.answers[idx]}", ephemeral=True)
+            await self.refresh_display(interaction)
+            await interaction.response.send_message(f"You voted {self.answers[idx]}", ephemeral=True, delete_after=2)
 
         return callback
 
@@ -87,23 +87,20 @@ class Poll():   # poll to display percentages only, no names
         del self.choices[interaction.user.id]
         await interaction.response.send_message(f"You cancelled your vote for {self.answers[vote_idx]}", ephemeral=True)
 
+    async def send_poll(self): # 1st display of question + answers
+        message_content = f"_Last update at {time.strftime('%X')} on day {time.strftime('%x')}_"
 
-    async def send_poll(self, *args, **kwargs):
-        await self.ctx.send("Question : " + self.question, view=self.buttons_view)
-
-        # image update + 1st display
         percentages = [0 for k in range(len(self.answers))]
-        percentage_display(percentages)
 
-        message_content = f"_Last update at {time.strftime('%X')} on day {time.strftime('%x')}_\n"
-        message_content += self.question + f" :\n"
+        embed = discord.Embed(
+            title=f"Question : {self.question} (0 vote)",
+            fields=[discord.EmbedField(name=f"{self.answers[k]} :", value=f"**|** 0 %", inline=False) for k in range(len(self.answers))],
+            color=discord.Color.random()
+            )
 
-        for i in range(len(self.answers)):
-            message_content += f"{chr(ord('@')+i+1)} : {self.answers[i]}\n"
+        await self.ctx.send(embeds=[embed], content=message_content, view=self.buttons_view)
 
-        await self.ctx.send(content=message_content, file=discord.File('barChart.png'), view=self.display_view)
-
-        await self.display_view.wait()
+        await self.buttons_view.wait()
 
 
 def better_str(list):
@@ -162,30 +159,29 @@ class PollWho():    # poll to know who and no percentages display
             tot += 1
 
         embed = discord.Embed(
-            title=f"Question : {self.question} ({str(tot)} votes)",
-            fields=[discord.EmbedField(name=f"{self.answers[k]} : {str(len(votes[k]))} votes", value=f"{better_str(votes[k])}", inline=False) for k in range(len(votes))],
+            title=f"Question : {self.question} ({str(tot)} vote"+(len(votes)>1)*"s"+")",
+            fields=[discord.EmbedField(name=f"{self.answers[k]} : {str(len(votes[k]))} vote"+(len(votes[k])>1)*"s", value=f"{better_str(votes[k])}", inline=False) for k in range(len(votes))],
             color=discord.Color.random(),
             )
 
         # add last update in italic to content
         message_content = f"\n_Last update at {time.strftime('%X')} on day {time.strftime('%x')}_"
-        # await interaction.message.edit(content=message_content)
+
         await interaction.message.edit(content=message_content, embeds=[embed], view=self.buttons_view)
 
     def create_callbackfunction(self, idx):
         async def callback(interaction):
             self.choices[interaction.user.id] = idx
             print(f"{time.strftime('%X')} on day {time.strftime('%x')} : {interaction.user.name} answered {self.answers[idx]} to {self.question}")
-            # await interaction.response.send_message(f"You voted {self.answers[idx]}", ephemeral=True)
-            await interaction.response.defer()
+            # await interaction.response.defer()
             await self.refresh_display(interaction)
-
+            await interaction.response.send_message(f"You voted {self.answers[idx]}", ephemeral=True, delete_after=2)
         return callback
 
     async def add_answer_callback(self, interaction):
         
         if (len(self.answers)>=23):
-            await interaction.response.send_message(content=f"No more answers allowed.", ephemeral=True)
+            await interaction.response.send_message(content=f"No more answers allowed.", ephemeral=True, delete_after=5)
         else :
             modal = discord.ui.Modal(title=f'Modal for answer entry')
             input = discord.ui.InputText(
@@ -217,6 +213,7 @@ class PollWho():    # poll to know who and no percentages display
 
             print(f"{time.strftime('%X')} on day {time.strftime('%x')} : {interaction.user.name} added the answer {self.answers[-1]} to {self.question}")
             await self.refresh_display(interaction)
+            await interaction.response.send_message(content=f"Answer {new_answer} added.", ephemeral=True, delete_after=1)
 
     async def cancel_callback(self, interaction):
         vote_idx = self.choices[interaction.user.id]
@@ -239,6 +236,13 @@ class PollWho():    # poll to know who and no percentages display
         await self.ctx.send(embeds=[embed], content=message_content, view=self.buttons_view)
 
         await self.buttons_view.wait()
+
+    #TODO
+    """def save_to_json(self, path=None):
+        save_file = open("poll_who.json","w+")
+        json_string = json.dump(self, save_file)
+        save_file.close()"""
+
 
 class PollFillingModal(discord.ui.Modal):
     def __init__(self, ctx:discord.ApplicationContext, *args, **kwargs) -> None:
@@ -324,3 +328,6 @@ class PollWhoFillingModal(discord.ui.Modal):
 
         await poll_who.send_poll()
         await poll_who.display_view.wait()
+
+    async def on_error(self, interaction: discord.Interaction, error: Exception) -> None:
+        await interaction.response.send_message('Oops! Something went wrong.', ephemeral=True)
