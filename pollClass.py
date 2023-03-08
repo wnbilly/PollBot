@@ -43,6 +43,7 @@ class Poll():   # poll to display percentages only, no names
         self.display_view.add_item(button_refresh_display)
         self.display_view.timeout = None
 
+        print(f"{time.strftime('%X')} on day {time.strftime('%x')} : {ctx.interaction.user.name} created a poll : " + question)
 
     async def refresh_display(self, interaction):
         print(f"{time.strftime('%X')} on day {time.strftime('%x')} : {interaction.user.name} refreshed poll : "+ self.question)
@@ -146,8 +147,6 @@ class PollWho():    # poll to know who and no percentages display
         print(f"{time.strftime('%X')} on day {time.strftime('%x')} : {ctx.interaction.user.name} created a pollWho : " + question)
 
     async def refresh_display(self, interaction):
-        print(f"{time.strftime('%X')} on day {time.strftime('%x')} : {interaction.user.name} refreshed poll_who : "+ self.question)
-
         tot = 0
         votes = [[] for _ in range(len(self.answers))]
 
@@ -213,7 +212,6 @@ class PollWho():    # poll to know who and no percentages display
 
             print(f"{time.strftime('%X')} on day {time.strftime('%x')} : {interaction.user.name} added the answer {self.answers[-1]} to {self.question}")
             await self.refresh_display(interaction)
-            await interaction.response.send_message(content=f"Answer {new_answer} added.", ephemeral=True, delete_after=1)
 
     async def cancel_callback(self, interaction):
         vote_idx = self.choices[interaction.user.id]
@@ -237,7 +235,7 @@ class PollWho():    # poll to know who and no percentages display
 
         await self.buttons_view.wait()
 
-    #TODO
+    # TODO
     """def save_to_json(self, path=None):
         save_file = open("poll_who.json","w+")
         json_string = json.dump(self, save_file)
@@ -281,7 +279,7 @@ class PollFillingModal(discord.ui.Modal):
         self.answers = [self.children[i].value for i in range(1,5)] # only 4 answers possible at the moment
 
         poll = Poll(self.ctx, self.question, self.answers)
-        print(f"{self.ctx.interaction.user.name} created a poll via menu : " + self.question)
+        print(f"{time.strftime('%X')} on day {time.strftime('%x')} : {self.ctx.interaction.user.name} created a poll via menu : " + self.question)
 
         await poll.send_poll()
         await poll.display_view.wait()
@@ -324,7 +322,7 @@ class PollWhoFillingModal(discord.ui.Modal):
         self.answers = [self.children[i].value for i in range(1,5)] # only 4 answers possible at the moment
 
         poll_who = PollWho(self.ctx, self.question, self.answers)
-        print(f"{self.ctx.interaction.user.name} created a poll via menu : " + self.question)
+        print(f"{time.strftime('%X')} on day {time.strftime('%x')} : {self.ctx.interaction.user.name} created a poll via menu : " + self.question)
 
         await poll_who.send_poll()
         await poll_who.display_view.wait()

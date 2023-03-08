@@ -110,4 +110,3 @@ class React():
         for i in range(len(reaction_emojis)):
             await msg.add_reaction(reaction_emojis[i])
             response_content += f"{reaction_emojis[i]} "
-        await ctx.interaction.response.send_message(content=f"Reaction {response_content} cancelled.", ephemeral=True, delete_after=1)
