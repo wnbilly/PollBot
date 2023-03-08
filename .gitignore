@@ -2,4 +2,5 @@
 _pycache_/
 
 # Processed images
+imgGenerator.py
 *.png
