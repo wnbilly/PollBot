@@ -1,0 +1,5 @@
+.idea/
+_pycache_/
+
+# Processed images
+*.png
