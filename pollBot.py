@@ -1,34 +1,28 @@
-# https://github.com/Pycord-Development/pycord/blob/master/examples/app_commands/slash_options.py
-
 import sys
-import time
-import random
 
 import discord
-from discord.ext import commands
-from discord import option, InteractionMessage, ApplicationCommand, MessageCommand
-from discord.ui import Button, View
-from pollClass import Poll, PollWho, PollFillingModal, PollWhoFillingModal
-from reactClass import React
+from discord import option, SlashCommandOptionType
 
+from pollClass import Poll, PollWho, PollFillingModal
+from reactClass import ReactModal, reactions_cancel
 
 try:
     TOKEN = sys.argv[1]
 except IndexError:
-    print("Bot Token required as following : $ python3 pollBot.py TOKEN")
+    print("Bot token required as following : $ python3 pollBot.py TOKEN")
     quit(0)
 
-
 try:
+    bot = discord.Bot(auto_sync_commands=True)
 
-    bot = discord.Bot(command_prefix="+")
     @bot.event
     async def on_ready():
         print(f"{bot.user} ready.")
 
-    # initial poll command, disactivated until a better version (need to resend a message to update results)
-    # poll command, callable via /poll "question" "answer1" "answer2"
-    @bot.slash_command(name="poll", description="Create a poll")
+
+    # initial poll command
+    # poll command, callable via /poll "question" "answer1" "answer2" ... "more_answers"
+    @bot.slash_command(name="poll", description="Create a percentages poll")
     @option("question", description="Enter the question to ask")
     @option("answer1", description="Enter 1st answer")
     @option("answer2", description="Enter 2nd answer", required=False)
@@ -38,28 +32,20 @@ try:
     @option("answer6", description="Enter 6th answer", required=False)
     @option("answer7", description="Enter 7th answer", required=False)
     @option("answer8", description="Enter 8th answer", required=False)
-    @option("display", description="Choose the way to display the results :\n 0 : None \n 1 : Bars", choices=[0, 1], required=False)
-
-    async def poll(
-        ctx: discord.ApplicationContext,
-        question: str,
-        answer1: str,
-        answer2: str,
-        answer3: str,
-        answer4: str,
-        answer5: str,
-        answer6: str,
-        answer7: str,
-        answer8: str,
-        display: int,
-    ):
+    @option(name="more_answers", description="Choose if others can add answers to the poll (0 or 1)",
+            type=SlashCommandOptionType.integer, min_value=0, max_value=1, default=True)
+    async def poll(ctx: discord.ApplicationContext, question: str, answer1: str, answer2: str, answer3: str,
+                   answer4: str, answer5: str, answer6: str,
+                   answer7: str, answer8: str, more_answers):
         answers = [answer1, answer2, answer3, answer4, answer5, answer6, answer7, answer8]
-        poll = Poll(ctx, question, answers)
-        await poll.send_poll() # ctx.interaction 
-        await poll.display_view.wait()
+        poll = Poll(ctx, question, answers, more_answers)
+        await ctx.interaction.response.send_message(content=f"You sent the poll : {question}", ephemeral=True,
+                                                    delete_after=2)
+        await poll.send_poll()
 
-    # poll command, callable via /poll_who "question"
-    @bot.slash_command(name="poll_who", description="Create a poll to know who")
+
+    # poll command, callable via /poll_who "question" "answer1" "answer2" ... "more_answers"
+    @bot.slash_command(name="poll_who", description="Create a names poll")
     @option("question", description="Enter the question to ask")
     @option("answer1", description="Enter 1st answer")
     @option("answer2", description="Enter 2nd answer", required=False)
@@ -69,70 +55,53 @@ try:
     @option("answer6", description="Enter 6th answer", required=False)
     @option("answer7", description="Enter 7th answer", required=False)
     @option("answer8", description="Enter 8th answer", required=False)
-    @option("display", description="Choose the way to display the results :\n 0 : None \n 1 : Bars", choices=[0, 1], required=False)
-
-    async def poll_who(
-        ctx: discord.ApplicationContext,
-        question: str,
-        answer1: str,
-        answer2: str,
-        answer3: str,
-        answer4: str,
-        answer5: str,
-        answer6: str,
-        answer7: str,
-        answer8: str,
-        display: int,
-    ):
+    @option(name="more_answers", description="Choose if others can add answers to the poll (0 or 1)",
+            type=SlashCommandOptionType.integer, min_value=0, max_value=1, default=True)
+    async def poll_who(ctx: discord.ApplicationContext, question: str, answer1: str, answer2: str, answer3: str,
+                       answer4: str, answer5: str, answer6: str,
+                       answer7: str, answer8: str, more_answers):
         answers = [answer1, answer2, answer3, answer4, answer5, answer6, answer7, answer8]
-        poll_who = PollWho(ctx, question, answers)
+        poll_who = PollWho(ctx, question, answers, more_answers)
+
+        await ctx.interaction.response.send_message(content=f"You sent the poll : {question}", ephemeral=True,
+                                                    delete_after=2)
         await poll_who.send_poll()
-        await poll_who.buttons_view.wait()
 
 
     # same poll command as before
     # poll message command, callable via message context menus
     @bot.message_command(name="Create a poll", description="Create a poll with a percentage bars display via a modal")
-    async def poll_app_command(
-        ctx: discord.ApplicationContext,
-        msg: discord.Message
-    ):
-        modal = PollFillingModal(title="Poll Filling Modal", ctx=ctx)
-        
+    async def poll_app_command(ctx: discord.ApplicationContext, msg: discord.Message):
+        modal = PollFillingModal(title="Poll Filling Modal", ctx=ctx, poll_class=Poll)
+
         await ctx.interaction.response.send_modal(modal)
 
 
     # poll_who message command, callable via message context menus
     @bot.message_command(name="Create a pollWho", description="Create a poll with a names display via a modal")
-    async def poll_who_app_command(
-        ctx: discord.ApplicationContext,
-        msg: discord.Message
-    ):
-        modal = PollWhoFillingModal(title="PollWho Filling Modal", ctx=ctx)
-
+    async def poll_who_app_command(ctx: discord.ApplicationContext, msg: discord.Message):
+        modal = PollFillingModal(title="PollWho Filling Modal", ctx=ctx, poll_class=PollWho)
         await ctx.interaction.response.send_modal(modal)
 
-    # react a text with discord reactions via the message menu
+
+    # reacts a text with discord reactions via the message menu
     @bot.message_command(name="React")
     async def react_callback(ctx: discord.ApplicationContext, msg: discord.Message):
-        react = React()
-        await react.response(ctx, msg)
+        modal = ReactModal(ctx, msg)
+        await ctx.interaction.response.send_modal(modal)
+        # await modal.wait()
 
+
+    # cancels the reactions of the bot to a message
     @bot.message_command(name="React cancel")
     async def react_cancel_callback(ctx: discord.ApplicationContext, msg: discord.Message):
-        response_content = ""
-
-        # 2 LOOPS TO AVOID "INTERACTION ALREADY RESPONDED TO" WHEN TOO MANY REACTIONS (ctx.interaction.response.defer() not working here)
-        for reaction in msg.reactions: # loop to get the emojis and make the message
-            response_content += f"{reaction.emoji} "
-        
-        await ctx.interaction.response.send_message(content=f"Reaction {response_content} cancelled.", ephemeral=True, delete_after=1)
-        print(f"{time.strftime('%X')} on day {time.strftime('%x')} : {ctx.user.name} cancelled the reaction {response_content} to the message {msg.id}")
-        for reaction in msg.reactions: # loop to remove the reactions
-            await reaction.remove(bot.user)
+        await reactions_cancel(ctx, msg, bot)
 
 
     bot.run(TOKEN)
 
 except KeyboardInterrupt:
-    print("pollBot shutting down ...")
+    print("\nPollBot shutting down...")
+
+except discord.errors.LoginFailure:
+    print("Invalid token, please check your token and try again.")
