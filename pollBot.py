@@ -89,7 +89,6 @@ try:
     async def react_callback(ctx: discord.ApplicationContext, msg: discord.Message):
         modal = ReactModal(ctx, msg)
         await ctx.interaction.response.send_modal(modal)
-        # await modal.wait()
 
 
     # cancels the reactions of the bot to a message

@@ -95,11 +95,6 @@ class Poll:  # base class for a poll
         return callback
 
     async def update_display(self):
-        """
-        Update the display of the poll
-        :param :
-        :return:
-        """
         pass
 
     def create_toggle_button(self, option: bool, option_name, toggle_func):
